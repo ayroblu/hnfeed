@@ -1,0 +1,46 @@
+name: Update feed
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-feed
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Check out gh-pages into site/
+        run: |
+          if git fetch --depth 1 origin gh-pages:gh-pages; then
+            git worktree add site gh-pages
+          else
+            git worktree add --orphan -b gh-pages site
+          fi
+          touch site/.nojekyll
+
+      - name: Update feed
+        run: bun src/update.ts --feed site/feed.jsonl
+
+      - name: Publish
+        working-directory: site
+        run: |
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes"
+            exit 0
+          fi
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -m "Update feed"
+          git push origin gh-pages

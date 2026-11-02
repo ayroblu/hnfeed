@@ -1,0 +1,14 @@
+{
+  "name": "hnfeed",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "update": "bun src/update.ts",
+    "preview": "bun src/update.ts --dry-run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5"
+  }
+}
