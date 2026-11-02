@@ -20,7 +20,7 @@ const added = stories
 
 if (values["dry-run"]) {
   printCandidates(stories);
-} else if (added.length > 0) {
+} else {
   await writeFeed(values.feed, [...added.map((story) => toFeedItem(story, now)), ...existing].slice(0, FEED_SIZE));
 }
 console.log(`${added.length} new of ${stories.length} candidates`);
